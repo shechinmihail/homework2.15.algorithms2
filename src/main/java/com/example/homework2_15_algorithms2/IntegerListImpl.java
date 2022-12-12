@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class IntegerListImpl implements IntegerList {
 
-    private final Integer[] integerList;
+    private Integer[] integerList;
 
     private final int size;
 
@@ -17,6 +17,7 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public Integer add(Integer item) {
+        sizeExtension();
         if (item == null) {
             throw new RuntimeException();
         }
@@ -31,6 +32,7 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public Integer add(int index, Integer item) {
+        sizeExtension();
         if (index > integerList.length - 1) {
             throw new ArrayIndexOutOfBoundsException("Массив заполнен!");
         }
@@ -187,6 +189,12 @@ public class IntegerListImpl implements IntegerList {
         return result;
     }
 
+    private void sizeExtension() {
+        if (size == integerList.length) {
+            grow();
+        }
+    }
+
     public static Integer[] toRandomArrey() {
         Integer[] integers = new Integer[100000];
         for (int i = 0; i < integers.length; i++) {
@@ -232,10 +240,39 @@ public class IntegerListImpl implements IntegerList {
         }
     }
 
+    private void sort(Integer[] arr) {
+        quickSort(arr, 0, arr.length - 1);
+    }
+
     private static void swapElements(Integer[] arr, int indexA, int indexB) {
         int tmp = arr[indexA];
         arr[indexA] = arr[indexB];
         arr[indexB] = tmp;
+    }
+
+    public static void quickSort(Integer[] arr, int indexA, int indexB) {
+        if (indexA < indexB) {
+            int partitionIndex = partition(arr, indexA, indexB);
+
+            quickSort(arr, indexA, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, indexB);
+        }
+    }
+
+    private static int partition(Integer[] arr, int indexA, int indexB) {
+        int pivot = arr[indexB];
+        int i = (indexA - 1);
+
+        for (int j = indexA; j < indexB; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElements(arr, i, j);
+            }
+        }
+
+        swapElements(arr, i + 1, indexB);
+        return i + 1;
     }
 
     private static boolean binarySearch(Integer[] integers, Integer item) {
@@ -258,6 +295,9 @@ public class IntegerListImpl implements IntegerList {
         return false;
     }
 
+    private void grow() {
+        integerList = Arrays.copyOf(integerList, size + size / 2);
+    }
 
     public static void main(String[] args) {
         System.out.println("Первый прогон:");
